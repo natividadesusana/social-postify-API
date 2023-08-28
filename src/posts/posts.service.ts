@@ -7,7 +7,7 @@ import {
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsRepository } from './posts.repository';
-import { PublicationsRepository } from 'src/publications/publications.repository';
+import { PublicationsRepository } from '@/publications/publications.repository';
 
 @Injectable()
 export class PostsService {
@@ -24,7 +24,7 @@ export class PostsService {
     if (image !== undefined) {
       postData.image = image;
     }
-    
+
     return await this.postsRepository.create(postData);
   }
 

@@ -4,7 +4,7 @@ import { PublicationsController } from './publications.controller';
 import { MediasModule } from '../medias/medias.module';
 import { PostsModule } from '../posts/posts.module';
 import { PublicationsRepository } from './publications.repository';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Module({
   imports: [forwardRef(() => MediasModule), forwardRef(() => PostsModule)],
