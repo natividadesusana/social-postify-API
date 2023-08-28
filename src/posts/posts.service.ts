@@ -1,26 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PostsRepository } from './posts.repository';
+import { PublicationsRepository } from 'src/publications/publications.repository';
 
 @Injectable()
 export class PostsService {
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  constructor(
+    private readonly postsRepository: PostsRepository,
+    private readonly publicationsRepository: PublicationsRepository,
+  ) {}
+
+  async create(body: CreatePostDto) {
+    const { title, text, image } = body;
+    if (!title || !text) throw new BadRequestException();
+
+    const postData: CreatePostDto = { title, text };
+    if (image !== undefined) {
+      postData.image = image;
+    }
+    
+    return await this.postsRepository.create(postData);
   }
 
-  findAll() {
-    return `This action returns all posts`;
+  async findAll() {
+    return await this.postsRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(id: number) {
+    const post = await this.postsRepository.findOne(id);
+    if (!post) throw new NotFoundException();
+    return post;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: number, body: UpdatePostDto) {
+    const post = await this.postsRepository.findOne(id);
+    if (!post) throw new NotFoundException();
+    return await this.postsRepository.update(id, body);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: number) {
+    const postInPublication = await this.publicationsRepository.postInPublication(id);
+    if (postInPublication) throw new ForbiddenException();
+    return await this.postsRepository.remove(id);
   }
 }
